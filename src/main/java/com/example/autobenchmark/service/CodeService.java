@@ -18,17 +18,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 
+import static com.example.autobenchmark.config.Constants.BASE_DIRECTORY;
+
 @Service
 public class CodeService implements ICodeService
 {
     private static final Logger logger = LoggerFactory.getLogger(CodeService.class);
 
-    private final String SAVING_PATH = "/home/illia/emscripten/generated-code/";
-
     @Override
     public Double compileNode(String command, String folder) 
     {
-        ServiceResponse response = executeCommand(command, SAVING_PATH);
+        ServiceResponse response = executeCommand(command, BASE_DIRECTORY);
         if(response.getResponseCode() == ServiceResponseCodeEnum.SUCCESS)
         {
             logger.info(response.getMessage());
@@ -46,13 +46,13 @@ public class CodeService implements ICodeService
         try
         {
             ObjectMapper mapper = new ObjectMapper();
-            String filePath = SAVING_PATH + folder + "/output.json";
+            String filePath = BASE_DIRECTORY + folder + "/output.json";
             JsonNode jsonNode = mapper.readTree(new File(filePath));
             return jsonNode.get("time").asDouble();
         }
         catch(IOException e)
         {
-            logger.error("Error while reading time from " + SAVING_PATH + folder + "/output.json. Reason: " + e.getMessage());
+            logger.error("Error while reading time from " + BASE_DIRECTORY + folder + "/output.json. Reason: " + e.getMessage());
             return null;
         }
     }
@@ -98,14 +98,21 @@ public class CodeService implements ICodeService
             try(BufferedReader infoReader = new BufferedReader(new InputStreamReader(process.getInputStream())))
             {
                 List<String> lines = infoReader.lines().toList();
-                response.setMessage(String.join("\n", lines));
+                //check if there is any output and then set it to response
+                if(!lines.isEmpty())
+                {
+                    response.setMessage(String.join("\n", lines));
+                }
             }
 
             try(BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream())))
             {
                 List<String> errorLines = errorReader.lines().toList();
                 //errorLines.forEach(logger::error);
-                response.setMessage(String.join("\n", errorLines));
+                if (!errorLines.isEmpty())
+                {
+                    response.setMessage(String.join("\n", errorLines));
+                }
             }
 
             int exitCode = process.waitFor(); // Waits for the process to complete and returns the exit code

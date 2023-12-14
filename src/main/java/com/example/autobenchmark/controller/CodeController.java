@@ -16,6 +16,9 @@ import com.example.autobenchmark.dto.ServiceResponseCodeEnum;
 import com.example.autobenchmark.model.UserRequest;
 import com.example.autobenchmark.service.ICodeService;
 
+import static com.example.autobenchmark.config.Constants.BASE_DIRECTORY;
+import static com.example.autobenchmark.config.Constants.TIMEOUT;
+
 @RestController
 @RequestMapping("/api")
 public class CodeController 
@@ -25,21 +28,17 @@ public class CodeController
     @Autowired
     private ICodeService codeService;
 
-    private final String SAVING_PATH = "/home/illia/emscripten/generated-code/";
-    
-    private final String TIMEOUT = "300";
-
     @PostMapping("/client/js")
     public ResponseEntity<String> compileClientJS(@RequestBody UserRequest userRequest)
     {
-        if(!codeService.createUserDirectory(SAVING_PATH + userRequest.getId()))
+        if(!codeService.createUserDirectory(BASE_DIRECTORY + userRequest.getId()))
         {
             return ResponseEntity.internalServerError().body("Internal server error");
         }
 
-        String basePath = SAVING_PATH + userRequest.getId() + "/";
+        String workDir = BASE_DIRECTORY + userRequest.getId() + "/";
 
-        String cFilePath = basePath + userRequest.getId() + ".c";
+        String cFilePath = workDir + userRequest.getId() + ".c";
 
         if(!codeService.saveFile(cFilePath, userRequest.getSourceCode()))
         {
@@ -60,7 +59,7 @@ public class CodeController
         command.append("-s ENVIRONMENT=web ");
         command.append("-O2");
         
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), basePath);
+        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -81,14 +80,14 @@ public class CodeController
     @PostMapping("/client/wasm")
     public ResponseEntity<String> compileClientWasm(@RequestBody UserRequest userRequest)
     {
-        if(!codeService.createUserDirectory(SAVING_PATH + userRequest.getId()))
+        if(!codeService.createUserDirectory(BASE_DIRECTORY + userRequest.getId()))
         {
             return ResponseEntity.internalServerError().body("Internal server error");
         }
 
-        String basePath = SAVING_PATH + userRequest.getId() + "/";
+        String workDir = BASE_DIRECTORY + userRequest.getId() + "/";
 
-        String cFilePath = basePath + userRequest.getId() + ".c";
+        String cFilePath = workDir + userRequest.getId() + ".c";
 
         if(!codeService.saveFile(cFilePath, userRequest.getSourceCode()))
         {
@@ -109,7 +108,7 @@ public class CodeController
         command.append("-s WASM_BIGINT=1 ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), basePath);
+        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -130,14 +129,14 @@ public class CodeController
     @PostMapping("/server/js")
     public ResponseEntity<String> compileServerJS(@RequestBody UserRequest userRequest)
     {
-        if(!codeService.createUserDirectory(SAVING_PATH + userRequest.getId()))
+        if(!codeService.createUserDirectory(BASE_DIRECTORY + userRequest.getId()))
         {
             return ResponseEntity.internalServerError().body("Internal server error");
         }
 
-        String basePath = SAVING_PATH + userRequest.getId() + "/";
+        String workDir = BASE_DIRECTORY + userRequest.getId() + "/";
 
-        String cFilePath = basePath + userRequest.getId() + ".c";
+        String cFilePath = workDir + userRequest.getId() + ".c";
 
         if(!codeService.saveFile(cFilePath, userRequest.getSourceCode()))
         {
@@ -145,7 +144,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        String jsonInputsPath = basePath + userRequest.getId() + ".json";
+        String jsonInputsPath = workDir + userRequest.getId() + ".json";
 
         if(userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs()))
         {
@@ -165,7 +164,7 @@ public class CodeController
         command.append("-s ENVIRONMENT=node ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), basePath);
+        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -182,7 +181,7 @@ public class CodeController
 
         String runTimeInputStringJSON = "{\n\t\"fileName\": \"" + userRequest.getId() + "\",\n\t\"functionName\": \"" + userRequest.getFunctionName() + "\"\n}";
 
-        String jsonRunTimePath = basePath + "names.json";
+        String jsonRunTimePath = workDir + "names.json";
 
         if(userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON))
         {
@@ -190,7 +189,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        String benchmarkCommand = "./run_container " + 
+        String benchmarkCommand = "./run_node_container " + 
                                     TIMEOUT + " " + 
                                     userRequest.getId();
 
@@ -207,14 +206,14 @@ public class CodeController
     @PostMapping("/server/wasm")
     public ResponseEntity<String> compileServerWasm(@RequestBody UserRequest userRequest)
     {
-        if(!codeService.createUserDirectory(SAVING_PATH + userRequest.getId()))
+        if(!codeService.createUserDirectory(BASE_DIRECTORY + userRequest.getId()))
         {
             return ResponseEntity.internalServerError().body("Internal server error");
         }
 
-        String basePath = SAVING_PATH + userRequest.getId() + "/";
+        String workDir = BASE_DIRECTORY + userRequest.getId() + "/";
 
-        String cFilePath = basePath + userRequest.getId() + ".c";
+        String cFilePath = workDir + userRequest.getId() + ".c";
 
         if(!codeService.saveFile(cFilePath, userRequest.getSourceCode()))
         {
@@ -222,7 +221,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        String jsonInputsPath = basePath + userRequest.getId() + ".json";
+        String jsonInputsPath = workDir + userRequest.getId() + ".json";
 
         if(userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs()))
         {
@@ -242,7 +241,7 @@ public class CodeController
         command.append("-s WASM_BIGINT=1 ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), basePath);
+        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -259,7 +258,7 @@ public class CodeController
 
         String runTimeInputStringJSON = "{\n\t\"fileName\": \"" + userRequest.getId() + "\",\n\t\"functionName\": \"" + userRequest.getFunctionName() + "\"\n}";
 
-        String jsonRunTimePath = basePath + "names.json";
+        String jsonRunTimePath = workDir + "names.json";
 
         if(userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON))
         {
@@ -267,7 +266,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        String benchmarkCommand = "./run_container " + 
+        String benchmarkCommand = "./run_node_container " + 
                                     TIMEOUT + " " + 
                                     userRequest.getId();
 
