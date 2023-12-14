@@ -48,8 +48,8 @@ public class CodeController
 
         StringBuilder command = new StringBuilder();
         command.append("emcc ");
-        command.append(userRequest.getId() + ".c ");
-        command.append("-o " + userRequest.getId()  + ".js ");
+        command.append("/app/" + userRequest.getId() + ".c ");
+        command.append("-o /app/" + userRequest.getId()  + ".js ");
         command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
         command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
         command.append("-s MODULARIZE=1 ");
@@ -58,8 +58,12 @@ public class CodeController
         command.append("-s WASM=0 ");
         command.append("-s ENVIRONMENT=web ");
         command.append("-O2");
-        
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
+
+        String emscriptenCommand = "./run_emscripten_container " + 
+                                    userRequest.getId() + " " +
+                                    "\"" + command.toString() + "\"";
+
+        ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -97,8 +101,8 @@ public class CodeController
 
         StringBuilder command = new StringBuilder();
         command.append("emcc ");
-        command.append(userRequest.getId() + ".c ");
-        command.append("-o " + userRequest.getId()  + ".js ");
+        command.append("/app/" + userRequest.getId() + ".c ");
+        command.append("-o /app/" + userRequest.getId()  + ".js ");
         command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
         command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
         command.append("-s MODULARIZE=1 ");
@@ -108,7 +112,11 @@ public class CodeController
         command.append("-s WASM_BIGINT=1 ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
+        String emscriptenCommand = "./run_emscripten_container " + 
+                                    userRequest.getId() + " " +
+                                    "\"" +command.toString() + "\"";
+
+        ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -154,8 +162,8 @@ public class CodeController
 
         StringBuilder command = new StringBuilder();
         command.append("emcc ");
-        command.append(userRequest.getId() + ".c ");
-        command.append("-o " + userRequest.getId()  + ".js ");
+        command.append("/app/" + userRequest.getId() + ".c ");
+        command.append("-o /app/" + userRequest.getId()  + ".js ");
         command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
         command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
         command.append("-s MODULARIZE=1 ");
@@ -164,7 +172,11 @@ public class CodeController
         command.append("-s ENVIRONMENT=node ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
+        String emscriptenCommand = "./run_emscripten_container " + 
+                                    userRequest.getId() + " " +
+                                    "\"" +command.toString() + "\"";
+
+        ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
@@ -231,8 +243,8 @@ public class CodeController
         
         StringBuilder command = new StringBuilder();
         command.append("emcc ");
-        command.append(userRequest.getId() + ".c ");
-        command.append("-o " + userRequest.getId()  + ".js ");
+        command.append("/app/" + userRequest.getId() + ".c ");
+        command.append("-o /app/" + userRequest.getId()  + ".js ");
         command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
         command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
         command.append("-s MODULARIZE=1 ");
@@ -241,7 +253,11 @@ public class CodeController
         command.append("-s WASM_BIGINT=1 ");
         command.append("-O2");
 
-        ServiceResponse response = codeService.compileEmscripten(command.toString(), workDir);
+        String emscriptenCommand = "./run_emscripten_container " + 
+                                    userRequest.getId() + " " +
+                                    "\"" +command.toString() + "\"";
+
+        ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
         if(response.getResponseCode() != ServiceResponseCodeEnum.SUCCESS)
         {
