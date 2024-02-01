@@ -77,7 +77,7 @@ public class CodeService implements ICodeService
     {
         try
         {
-            FileUtils.deleteDirectory(new File(path));
+            FileUtils.deleteDirectory(new File(BASE_DIRECTORY + path));
             logger.info("Successfully deleted directory " + path);
         }
         catch(IOException e)

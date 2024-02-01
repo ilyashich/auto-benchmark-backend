@@ -1,5 +1,6 @@
 package com.example.autobenchmark.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -9,6 +10,8 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Configuration
 public class CorsAndResourceHandlerConfiguration implements WebMvcConfigurer
 {
+    @Value("${base.directory.path}")
+    private String baseDirectoryPath;
     @Override
     public void addCorsMappings(CorsRegistry registry)
     {
@@ -20,7 +23,7 @@ public class CorsAndResourceHandlerConfiguration implements WebMvcConfigurer
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/files/**")
-                .addResourceLocations("file:/home/illia/emscripten/generated-code/")
+                .addResourceLocations("file:" + baseDirectoryPath)
                 .setCachePeriod(0)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());

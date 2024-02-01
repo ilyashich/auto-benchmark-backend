@@ -9,6 +9,8 @@ public class UserRequest
 {
     private String id;
 
+    private Integer numberOfExecutions;
+
     private String functionName;
 
     private String sourceCode;

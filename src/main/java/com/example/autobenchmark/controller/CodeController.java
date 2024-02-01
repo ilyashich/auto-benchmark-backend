@@ -18,6 +18,8 @@ import com.example.autobenchmark.service.ICodeService;
 
 import static com.example.autobenchmark.config.Constants.BASE_DIRECTORY;
 import static com.example.autobenchmark.config.Constants.TIMEOUT;
+import static com.example.autobenchmark.config.Constants.RUN_EMSCRIPTEN_CONTAINER_SCRIPT;
+import static com.example.autobenchmark.config.Constants.RUN_NODE_CONTAINER_SCRIPT;
 
 @RestController
 @RequestMapping("/api")
@@ -46,22 +48,37 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        StringBuilder command = new StringBuilder();
-        command.append("emcc ");
-        command.append("/app/" + userRequest.getId() + ".c ");
-        command.append("-o /app/" + userRequest.getId()  + ".js ");
-        command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
-        command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
-        command.append("-s MODULARIZE=1 ");
-        command.append("-s EXPORT_ES6=1 ");
-        command.append("-s EXPORT_NAME=createModule ");
-        command.append("-s WASM=0 ");
-        command.append("-s ENVIRONMENT=web ");
-        command.append("-O2");
+        String command = "emcc " +
+                "/app/" + userRequest.getId() + ".c " +
+                "-o /app/" + userRequest.getId() + ".js ";
 
-        String emscriptenCommand = "./run_emscripten_container " + 
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            command += "-s ENVIRONMENT=web " +
+                       "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                       "-s MODULARIZE=1 " +
+                       "-s EXPORT_ES6=1 " +
+                       "-s EXPORT_NAME=createModule " +
+                       "-Dmain=runMain " +
+                       "-s EXPORTED_FUNCTIONS=_runMain " +
+                       "-s WASM=0 " +
+                       "-O2";
+        }
+        else
+        {
+            command += "-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free " +
+                       "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                       "-s MODULARIZE=1 " +
+                       "-s EXPORT_ES6=1 " +
+                       "-s EXPORT_NAME=createModule " +
+                       "-s WASM=0 " +
+                       "-s ENVIRONMENT=web " +
+                       "-O2";
+        }
+
+        String emscriptenCommand = RUN_EMSCRIPTEN_CONTAINER_SCRIPT + " " +
                                     userRequest.getId() + " " +
-                                    "\"" + command.toString() + "\"";
+                                    "\"" + command + "\"";
 
         ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
@@ -99,22 +116,37 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        StringBuilder command = new StringBuilder();
-        command.append("emcc ");
-        command.append("/app/" + userRequest.getId() + ".c ");
-        command.append("-o /app/" + userRequest.getId()  + ".js ");
-        command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
-        command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
-        command.append("-s MODULARIZE=1 ");
-        command.append("-s EXPORT_ES6=1 ");
-        command.append("-s EXPORT_NAME=createModule ");
-        command.append("-s ENVIRONMENT=web ");
-        command.append("-s WASM_BIGINT=1 ");
-        command.append("-O2");
+        String command = "emcc " +
+                "/app/" + userRequest.getId() + ".c " +
+                "-o /app/" + userRequest.getId() + ".js ";
 
-        String emscriptenCommand = "./run_emscripten_container " + 
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            command += "-s ENVIRONMENT=web " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_ES6=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-Dmain=runMain " +
+                    "-s EXPORTED_FUNCTIONS=_runMain " +
+                    "-s WASM_BIGINT=1 " +
+                    "-O2";
+        }
+        else {
+
+            command += "-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_ES6=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-s ENVIRONMENT=web " +
+                    "-s WASM_BIGINT=1 " +
+                    "-O2";
+        }
+
+        String emscriptenCommand = RUN_EMSCRIPTEN_CONTAINER_SCRIPT + " " + 
                                     userRequest.getId() + " " +
-                                    "\"" +command.toString() + "\"";
+                                    "\"" + command + "\"";
 
         ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
@@ -160,21 +192,35 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        StringBuilder command = new StringBuilder();
-        command.append("emcc ");
-        command.append("/app/" + userRequest.getId() + ".c ");
-        command.append("-o /app/" + userRequest.getId()  + ".js ");
-        command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
-        command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
-        command.append("-s MODULARIZE=1 ");
-        command.append("-s EXPORT_NAME=createModule ");
-        command.append("-s WASM=0 ");
-        command.append("-s ENVIRONMENT=node ");
-        command.append("-O2");
+        String command = "emcc " +
+                "/app/" + userRequest.getId() + ".c " +
+                "-o /app/" + userRequest.getId() + ".js ";
 
-        String emscriptenCommand = "./run_emscripten_container " + 
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            command += "-s ENVIRONMENT=node " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-Dmain=runMain " +
+                    "-s EXPORTED_FUNCTIONS=_runMain " +
+                    "-s WASM=0 " +
+                    "-O2";
+        }
+        else {
+
+            command += "-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-s WASM=0 " +
+                    "-s ENVIRONMENT=node " +
+                    "-O2";
+        }
+
+        String emscriptenCommand = RUN_EMSCRIPTEN_CONTAINER_SCRIPT + " " + 
                                     userRequest.getId() + " " +
-                                    "\"" +command.toString() + "\"";
+                                    "\"" + command + "\"";
 
         ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
@@ -191,7 +237,13 @@ public class CodeController
             return ResponseEntity.internalServerError().body(message);
         }
 
-        String runTimeInputStringJSON = "{\n\t\"fileName\": \"" + userRequest.getId() + "\",\n\t\"functionName\": \"" + userRequest.getFunctionName() + "\"\n}";
+        String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
+                                            userRequest.getId() +
+                                            "\",\n\t\"functionName\": \"" +
+                                            userRequest.getFunctionName() +
+                                            "\",\n\t\"repeats\": \"" +
+                                            userRequest.getNumberOfExecutions() +
+                                            "\"\n}";
 
         String jsonRunTimePath = workDir + "names.json";
 
@@ -201,7 +253,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        String benchmarkCommand = "./run_node_container " + 
+        String benchmarkCommand = RUN_NODE_CONTAINER_SCRIPT + " " + 
                                     TIMEOUT + " " + 
                                     userRequest.getId();
 
@@ -240,22 +292,36 @@ public class CodeController
             codeService.cleanup(userRequest.getId());
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
-        
-        StringBuilder command = new StringBuilder();
-        command.append("emcc ");
-        command.append("/app/" + userRequest.getId() + ".c ");
-        command.append("-o /app/" + userRequest.getId()  + ".js ");
-        command.append("-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free ");
-        command.append("-s EXPORTED_RUNTIME_METHODS=ccall ");
-        command.append("-s MODULARIZE=1 ");
-        command.append("-s EXPORT_NAME=createModule ");
-        command.append("-s ENVIRONMENT=node ");
-        command.append("-s WASM_BIGINT=1 ");
-        command.append("-O2");
 
-        String emscriptenCommand = "./run_emscripten_container " + 
+        String command = "emcc " +
+                "/app/" + userRequest.getId() + ".c " +
+                "-o /app/" + userRequest.getId() + ".js ";
+
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            command += "-s ENVIRONMENT=node " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-Dmain=runMain " +
+                    "-s EXPORTED_FUNCTIONS=_runMain " +
+                    "-s WASM_BIGINT=1 " +
+                    "-O2";
+        }
+        else {
+
+            command += "-s EXPORTED_FUNCTIONS=_" + userRequest.getFunctionName() + ",_malloc,_free " +
+                    "-s EXPORTED_RUNTIME_METHODS=ccall " +
+                    "-s MODULARIZE=1 " +
+                    "-s EXPORT_NAME=createModule " +
+                    "-s ENVIRONMENT=node " +
+                    "-s WASM_BIGINT=1 " +
+                    "-O2";
+        }
+
+        String emscriptenCommand = RUN_EMSCRIPTEN_CONTAINER_SCRIPT + " " +
                                     userRequest.getId() + " " +
-                                    "\"" +command.toString() + "\"";
+                                    "\"" + command + "\"";
 
         ServiceResponse response = codeService.compileEmscripten(emscriptenCommand, BASE_DIRECTORY);
         
@@ -272,7 +338,13 @@ public class CodeController
             return ResponseEntity.internalServerError().body(message);
         }
 
-        String runTimeInputStringJSON = "{\n\t\"fileName\": \"" + userRequest.getId() + "\",\n\t\"functionName\": \"" + userRequest.getFunctionName() + "\"\n}";
+        String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
+                userRequest.getId() +
+                "\",\n\t\"functionName\": \"" +
+                userRequest.getFunctionName() +
+                "\",\n\t\"repeats\": \"" +
+                userRequest.getNumberOfExecutions() +
+                "\"\n}";
 
         String jsonRunTimePath = workDir + "names.json";
 
@@ -282,7 +354,7 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        String benchmarkCommand = "./run_node_container " + 
+        String benchmarkCommand = RUN_NODE_CONTAINER_SCRIPT + " " + 
                                     TIMEOUT + " " + 
                                     userRequest.getId();
 
