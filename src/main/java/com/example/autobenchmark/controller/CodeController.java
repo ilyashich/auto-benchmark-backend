@@ -52,8 +52,9 @@ public class CodeController
                 "/app/" + userRequest.getId() + ".c " +
                 "-o /app/" + userRequest.getId() + ".js ";
 
-        if(userRequest.getFunctionName().equals("runMain"))
+        if(userRequest.getFunctionName().equals("main"))
         {
+            userRequest.setFunctionName("runMain");
             command += "-s ENVIRONMENT=web " +
                        "-s EXPORTED_RUNTIME_METHODS=ccall " +
                        "-s MODULARIZE=1 " +
@@ -120,8 +121,9 @@ public class CodeController
                 "/app/" + userRequest.getId() + ".c " +
                 "-o /app/" + userRequest.getId() + ".js ";
 
-        if(userRequest.getFunctionName().equals("runMain"))
+        if(userRequest.getFunctionName().equals("main"))
         {
+            userRequest.setFunctionName("runMain");
             command += "-s ENVIRONMENT=web " +
                     "-s EXPORTED_RUNTIME_METHODS=ccall " +
                     "-s MODULARIZE=1 " +
@@ -196,8 +198,9 @@ public class CodeController
                 "/app/" + userRequest.getId() + ".c " +
                 "-o /app/" + userRequest.getId() + ".js ";
 
-        if(userRequest.getFunctionName().equals("runMain"))
+        if(userRequest.getFunctionName().equals("main"))
         {
+            userRequest.setFunctionName("runMain");
             command += "-s ENVIRONMENT=node " +
                     "-s EXPORTED_RUNTIME_METHODS=ccall " +
                     "-s MODULARIZE=1 " +
@@ -241,9 +244,9 @@ public class CodeController
                                             userRequest.getId() +
                                             "\",\n\t\"functionName\": \"" +
                                             userRequest.getFunctionName() +
-                                            "\",\n\t\"repeats\": \"" +
+                                            "\",\n\t\"repeats\": " +
                                             userRequest.getNumberOfExecutions() +
-                                            "\"\n}";
+                                            "\n}";
 
         String jsonRunTimePath = workDir + "names.json";
 
@@ -297,8 +300,9 @@ public class CodeController
                 "/app/" + userRequest.getId() + ".c " +
                 "-o /app/" + userRequest.getId() + ".js ";
 
-        if(userRequest.getFunctionName().equals("runMain"))
+        if(userRequest.getFunctionName().equals("main"))
         {
+            userRequest.setFunctionName("runMain");
             command += "-s ENVIRONMENT=node " +
                     "-s EXPORTED_RUNTIME_METHODS=ccall " +
                     "-s MODULARIZE=1 " +
@@ -342,9 +346,9 @@ public class CodeController
                 userRequest.getId() +
                 "\",\n\t\"functionName\": \"" +
                 userRequest.getFunctionName() +
-                "\",\n\t\"repeats\": \"" +
+                "\",\n\t\"repeats\": " +
                 userRequest.getNumberOfExecutions() +
-                "\"\n}";
+                "\n}";
 
         String jsonRunTimePath = workDir + "names.json";
 
