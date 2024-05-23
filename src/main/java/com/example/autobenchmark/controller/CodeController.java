@@ -186,12 +186,14 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        String jsonInputsPath = workDir + userRequest.getId() + ".json";
-
-        if(userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs()))
+        if(!userRequest.getFunctionName().equals("main"))
         {
-            codeService.cleanup(userRequest.getId());
-            return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            String jsonInputsPath = workDir + userRequest.getId() + ".json";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs())) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
         }
 
         String command = "emcc " +
@@ -240,31 +242,72 @@ public class CodeController
             return ResponseEntity.internalServerError().body(message);
         }
 
+        //=========================================================================================================
+
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
+                    userRequest.getId() +
+                    "\",\n\t\"repeats\": " +
+                    userRequest.getNumberOfExecutions() +
+                    "\n}";
+
+            String jsonRunTimePath = workDir + "names.json";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON)) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
+
+
+
+            String inputTxtPath = workDir + "input.txt";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(inputTxtPath, userRequest.getInputs())) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
+
+            String benchmarkCommand = "./run_node_container_main" + " " +
+                    TIMEOUT + " " +
+                    userRequest.getId();
+
+            Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
+
+            codeService.cleanup(userRequest.getId());
+
+            if (time != null)
+                return ResponseEntity.ok().body(time.toString());
+            else
+                return ResponseEntity.internalServerError().body("Error while performing benchmark");
+        }
+
+        //===========================================================================================================
+
         String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
-                                            userRequest.getId() +
-                                            "\",\n\t\"functionName\": \"" +
-                                            userRequest.getFunctionName() +
-                                            "\",\n\t\"repeats\": " +
-                                            userRequest.getNumberOfExecutions() +
-                                            "\n}";
+                userRequest.getId() +
+                "\",\n\t\"functionName\": \"" +
+                userRequest.getFunctionName() +
+                "\",\n\t\"repeats\": " +
+                userRequest.getNumberOfExecutions() +
+                "\n}";
 
         String jsonRunTimePath = workDir + "names.json";
 
-        if(userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON))
-        {
+        if (userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON)) {
             codeService.cleanup(userRequest.getId());
             return ResponseEntity.internalServerError().body("Failed to save user inputs");
         }
 
-        String benchmarkCommand = RUN_NODE_CONTAINER_SCRIPT + " " + 
-                                    TIMEOUT + " " + 
-                                    userRequest.getId();
+        String benchmarkCommand = RUN_NODE_CONTAINER_SCRIPT + " " +
+                TIMEOUT + " " +
+                userRequest.getId();
 
         Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
 
         codeService.cleanup(userRequest.getId());
 
-        if(time != null)
+        if (time != null)
             return ResponseEntity.ok().body(time.toString());
         else
             return ResponseEntity.internalServerError().body("Error while performing benchmark");
@@ -288,12 +331,14 @@ public class CodeController
             return ResponseEntity.internalServerError().body("Failed to save user code");
         }
 
-        String jsonInputsPath = workDir + userRequest.getId() + ".json";
-
-        if(userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs()))
+        if(!userRequest.getFunctionName().equals("main"))
         {
-            codeService.cleanup(userRequest.getId());
-            return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            String jsonInputsPath = workDir + userRequest.getId() + ".json";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(jsonInputsPath, userRequest.getInputs())) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
         }
 
         String command = "emcc " +
@@ -341,6 +386,50 @@ public class CodeController
             }         
             return ResponseEntity.internalServerError().body(message);
         }
+
+        //=========================================================================================================
+
+        if(userRequest.getFunctionName().equals("runMain"))
+        {
+            String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
+                    userRequest.getId() +
+                    "\",\n\t\"repeats\": " +
+                    userRequest.getNumberOfExecutions() +
+                    "\n}";
+
+            String jsonRunTimePath = workDir + "names.json";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(jsonRunTimePath, runTimeInputStringJSON)) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
+
+
+
+            String inputTxtPath = workDir + "input.txt";
+
+            if (userRequest.getInputs() == null || !codeService.saveFile(inputTxtPath, userRequest.getInputs())) {
+                codeService.cleanup(userRequest.getId());
+                return ResponseEntity.internalServerError().body("Failed to save user inputs");
+            }
+
+            String benchmarkCommand = "./run_node_container_main" + " " +
+                    TIMEOUT + " " +
+                    userRequest.getId();
+
+            Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
+
+            codeService.cleanup(userRequest.getId());
+
+            if (time != null)
+                return ResponseEntity.ok().body(time.toString());
+            else
+                return ResponseEntity.internalServerError().body("Error while performing benchmark");
+        }
+
+        //===========================================================================================================
+
+
 
         String runTimeInputStringJSON = "{\n\t\"fileName\": \"" +
                 userRequest.getId() +
