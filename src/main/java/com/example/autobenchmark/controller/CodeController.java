@@ -1,7 +1,5 @@
 package com.example.autobenchmark.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,8 +23,6 @@ import static com.example.autobenchmark.config.Constants.RUN_NODE_CONTAINER_SCRI
 @RequestMapping("/api")
 public class CodeController 
 {
-    private static final Logger logger = LoggerFactory.getLogger(CodeController.class);
-
     @Autowired
     private ICodeService codeService;
 
@@ -63,6 +59,7 @@ public class CodeController
                        "-Dmain=runMain " +
                        "-s EXPORTED_FUNCTIONS=_runMain " +
                        "-s WASM=0 " +
+                       "-s ALLOW_MEMORY_GROWTH=1 " +
                        "-O2";
         }
         else
@@ -74,6 +71,7 @@ public class CodeController
                        "-s EXPORT_NAME=createModule " +
                        "-s WASM=0 " +
                        "-s ENVIRONMENT=web " +
+                       "-s ALLOW_MEMORY_GROWTH=1 " +
                        "-O2";
         }
 
@@ -132,6 +130,7 @@ public class CodeController
                     "-Dmain=runMain " +
                     "-s EXPORTED_FUNCTIONS=_runMain " +
                     "-s WASM_BIGINT=1 " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
         else {
@@ -143,6 +142,7 @@ public class CodeController
                     "-s EXPORT_NAME=createModule " +
                     "-s ENVIRONMENT=web " +
                     "-s WASM_BIGINT=1 " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
 
@@ -210,6 +210,7 @@ public class CodeController
                     "-Dmain=runMain " +
                     "-s EXPORTED_FUNCTIONS=_runMain " +
                     "-s WASM=0 " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
         else {
@@ -220,6 +221,7 @@ public class CodeController
                     "-s EXPORT_NAME=createModule " +
                     "-s WASM=0 " +
                     "-s ENVIRONMENT=node " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
 
@@ -274,7 +276,7 @@ public class CodeController
 
             Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
 
-            codeService.cleanup(userRequest.getId());
+            //codeService.cleanup(userRequest.getId());
 
             if (time != null)
                 return ResponseEntity.ok().body(time.toString());
@@ -305,7 +307,7 @@ public class CodeController
 
         Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
 
-        codeService.cleanup(userRequest.getId());
+        //codeService.cleanup(userRequest.getId());
 
         if (time != null)
             return ResponseEntity.ok().body(time.toString());
@@ -355,6 +357,7 @@ public class CodeController
                     "-Dmain=runMain " +
                     "-s EXPORTED_FUNCTIONS=_runMain " +
                     "-s WASM_BIGINT=1 " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
         else {
@@ -365,6 +368,7 @@ public class CodeController
                     "-s EXPORT_NAME=createModule " +
                     "-s ENVIRONMENT=node " +
                     "-s WASM_BIGINT=1 " +
+                    "-s ALLOW_MEMORY_GROWTH=1 " +
                     "-O2";
         }
 
@@ -419,7 +423,7 @@ public class CodeController
 
             Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
 
-            codeService.cleanup(userRequest.getId());
+            //codeService.cleanup(userRequest.getId());
 
             if (time != null)
                 return ResponseEntity.ok().body(time.toString());
@@ -453,7 +457,7 @@ public class CodeController
 
         Double time = codeService.compileNode(benchmarkCommand, userRequest.getId());
 
-        codeService.cleanup(userRequest.getId());
+        //codeService.cleanup(userRequest.getId());
 
         if(time != null)
             return ResponseEntity.ok().body(time.toString());
